@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 
-import { Subscription, of } from 'rxjs';
+import { Subscription, of, Observable } from 'rxjs';
 
 import { Product } from './product';
 import { ProductService } from './product.service';
@@ -16,6 +16,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
   categories;
 
   products: Product[] = [];
+  products$: Observable<Product[]>;
   sub: Subscription;
 
   constructor(private productService: ProductService) { }
@@ -26,6 +27,8 @@ export class ProductListComponent implements OnInit, OnDestroy {
         products => this.products = products,
         error => this.errorMessage = error
       );
+
+    this.products$ = this.productService.getProducts(); 
 
       // of(2, 4, 6).pipe(
       //   map(item => item * 2),
