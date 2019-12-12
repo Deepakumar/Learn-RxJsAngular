@@ -1,9 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 
-import { Subscription } from 'rxjs';
+import { Subscription, of } from 'rxjs';
 
 import { Product } from './product';
 import { ProductService } from './product.service';
+import { map, tap, take } from 'rxjs/operators';
 
 @Component({
   templateUrl: './product-list.component.html',
@@ -25,6 +26,26 @@ export class ProductListComponent implements OnInit, OnDestroy {
         products => this.products = products,
         error => this.errorMessage = error
       );
+
+      // of(2, 4, 6).pipe(
+      //   map(item => item * 2),
+      //   map(item => item + 1)
+      // ).subscribe(console.log);
+
+      // of(2, 4, 6).pipe(
+      //   tap(item => console.log(item)),
+      //   map(item => item * 2),
+      //   tap(item => console.log(item)),
+      //   map(item => item + 1),
+      //   tap(item => console.log(item))
+      // ).subscribe();
+
+      // of(2, 4, 6).pipe(
+      //   map(item => item * 2),
+      //   tap(item => console.log(item)),
+      //   take(2),
+      //   tap(item => console.log(item))
+      // ).subscribe();
   }
 
   ngOnDestroy(): void {
