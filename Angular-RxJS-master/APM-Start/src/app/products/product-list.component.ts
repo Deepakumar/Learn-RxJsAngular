@@ -1,59 +1,31 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectionStrategy } from '@angular/core';
 
-import { Subscription, of, Observable } from 'rxjs';
+import { Subscription, of, Observable, EMPTY } from 'rxjs';
 
 import { Product } from './product';
 import { ProductService } from './product.service';
-import { map, tap, take } from 'rxjs/operators';
+import { map, tap, take, catchError } from 'rxjs/operators';
 
 @Component({
   templateUrl: './product-list.component.html',
-  styleUrls: ['./product-list.component.css']
+  styleUrls: ['./product-list.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ProductListComponent implements OnInit, OnDestroy {
+export class ProductListComponent   {
   pageTitle = 'Product List';
   errorMessage = '';
   categories;
 
   products: Product[] = [];
-  products$: Observable<Product[]>;
+  products$ = this.productService.products$.pipe(
+    catchError(err => {
+      this.errorMessage = err;
+      return EMPTY;
+    })
+  );
   sub: Subscription;
 
   constructor(private productService: ProductService) { }
-
-  ngOnInit(): void {
-    this.sub = this.productService.getProducts()
-      .subscribe(
-        products => this.products = products,
-        error => this.errorMessage = error
-      );
-
-    this.products$ = this.productService.getProducts(); 
-
-      // of(2, 4, 6).pipe(
-      //   map(item => item * 2),
-      //   map(item => item + 1)
-      // ).subscribe(console.log);
-
-      // of(2, 4, 6).pipe(
-      //   tap(item => console.log(item)),
-      //   map(item => item * 2),
-      //   tap(item => console.log(item)),
-      //   map(item => item + 1),
-      //   tap(item => console.log(item))
-      // ).subscribe();
-
-      // of(2, 4, 6).pipe(
-      //   map(item => item * 2),
-      //   tap(item => console.log(item)),
-      //   take(2),
-      //   tap(item => console.log(item))
-      // ).subscribe();
-  }
-
-  ngOnDestroy(): void {
-    this.sub.unsubscribe();
-  }
 
   onAdd(): void {
     console.log('Not yet implemented');
