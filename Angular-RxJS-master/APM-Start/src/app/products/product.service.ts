@@ -2,8 +2,8 @@ import { ProductCategoryService } from './../product-categories/product-category
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-import { Observable, throwError, combineLatest, BehaviorSubject } from 'rxjs';
-import { catchError, tap, map } from 'rxjs/operators';
+import { Observable, throwError, combineLatest, BehaviorSubject, Subject, merge } from 'rxjs';
+import { catchError, tap, map, scan, shareReplay } from 'rxjs/operators';
 
 import { Product } from './product';
 import { Supplier } from '../suppliers/supplier';
@@ -34,7 +34,8 @@ export class ProductService {
       category: categories.find(c => product.categoryId === c.id).name,
       searchKey: [product.productName]
     }) as Product)
-    )
+    ),
+    shareReplay(1)
   );
 
   private productSelectedSubject = new BehaviorSubject<number>(0);
@@ -44,6 +45,13 @@ export class ProductService {
     map(([products, selectedProductId]) =>
     products.find(product => product.id === selectedProductId)),
     tap(product => console.log('SelectedProduct', product))
+  );
+
+  private productInsertedSubject = new Subject<Product>();
+  productInsetedAction$ = this.productInsertedSubject.asObservable();
+
+  productsWithAdd$ = merge(this.productsWithCategory$, this.productInsetedAction$).pipe(
+    scan((acc: Product[], value: Product) => [...acc, value])
   );
 
   constructor(private http: HttpClient,
@@ -59,6 +67,11 @@ export class ProductService {
 
   selectedProductChnaged(selectedProductId: number): void {
     this.productSelectedSubject.next(selectedProductId);
+  }
+
+  addProduct(newProduct?: Product) {
+    newProduct = newProduct || this.fakeProduct();
+    this.productInsertedSubject.next(newProduct);
   }
 
   private fakeProduct() {
