@@ -2,6 +2,17 @@ import { hot, cold } from 'jasmine-marbles';
 import { concat } from 'rxjs/operators';
 
 describe('concat', () => {
+
+  it('should concat 2 observables',() => {
+    const $obs1 = cold('---a---b|');
+    const $obs2 = cold('---c---d');
+
+    const $result = $obs1.pipe(concat($obs2));
+    const $expected = cold('---a---b---c---d');
+
+    expect($result).toBeObservable($expected);
+  });
+
   it('should concat cold observables', () => {});
 
   describe('should identify subscription points in cold observable', () => {
