@@ -37,6 +37,7 @@ describe('hot', () => {
     expect(alphabets).toHaveSubscriptions(subscription);
   });
 
+
   function convertToUpperCase($alphabets) {
     return $alphabets.pipe(switchMap((s: string) => s.toUpperCase()));
   }
